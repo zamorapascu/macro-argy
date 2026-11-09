@@ -1,7 +1,7 @@
 // ---------- Cálculos ----------
-function compute(raw) {
-  const S = {}; for (const k of Object.keys(CFG.bcra)) S[k] = bcraSeries(raw["bcra_" + k]);
-  const out = { S };
+function compute(res) {
+  const raw = res.raw, S = parseAll(raw);
+  const out = { S, res };
 
   // Fecha de liquidación T+1 sobre el último día hábil, y CER con rezago de 10 hábiles
   let trade = today; while (!isBiz(trade)) trade -= DAY;
@@ -59,9 +59,29 @@ function compute(raw) {
     const tea = tea30(p.v); return { n, t: p.t, tna: p.v, tea, real: rem ? ((1 + tea / 100) / (1 + rem.v / 100) - 1) * 100 : null };
   });
 
-  // Dólar
-  out.mep = (Array.isArray(raw.mep) ? raw.mep : []).map(x => ({ t: ts(x.fecha), v: +x.venta })).filter(p => p.v > 0).sort((a, b) => a.t - b.t);
-  out.riesgo = (Array.isArray(raw.riesgo) ? raw.riesgo : []).map(x => ({ t: ts(x.fecha), v: +x.valor })).sort((a, b) => a.t - b.t);
+  // Dólar: brechas contra el mayorista del mismo día (o el último anterior)
+  out.mep = S.mep; out.riesgo = S.riesgo;
+  const brecha = s => s.map(p => { const m = at(S.mayorista, p.t); return m && p.t - m.t < 5 * DAY ? { t: p.t, v: (p.v / m.v - 1) * 100 } : null; }).filter(Boolean);
+  out.brechaMep = brecha(S.mep); out.brechaCcl = brecha(S.ccl);
+
+  // Compras de divisas del BCRA: suma de la semana (lunes a viernes) del último dato y del mes
+  const c = last(S.compras);
+  if (c) {
+    const d = new Date(c.t), lunes = c.t - ((d.getUTCDay() + 6) % 7) * DAY, mes = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1);
+    const sum = t0 => since(S.compras, t0).reduce((a, p) => a + p.v, 0);
+    out.compras = { t: c.t, semana: sum(lunes), lunes, mes: sum(mes), anio: sum(Date.UTC(d.getUTCFullYear(), 0, 1)) };
+  }
+  // Compras por mes (para el gráfico de barras)
+  const porMes = {};
+  for (const p of S.compras) { const d = new Date(p.t), k = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1); porMes[k] = (porMes[k] || 0) + p.v; }
+  out.comprasMes = Object.entries(porMes).map(([t, v]) => ({ t: +t, v })).sort((a, b) => a.t - b.t);
+
+  // Selic: el BCB publica la tasa vigente hasta la próxima reunión del Copom (fechas futuras)
+  out.selic = at(S.selic, today);
+
+  // Mundo
+  out.payrollsChg = diff(S.payems);          // miles de puestos por mes
+  out.usCpiYoy = yoy(S.uscpi);
   return out;
 }
 

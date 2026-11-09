@@ -20,20 +20,20 @@ function drawInflacion(o) {
     if (o.rem) ds.push(ref("REM 12 meses", o.rem.v, x0, x1, s2));
     if (o.infAnualizada != null) ds.push(ref("Actual anualizada", o.infAnualizada, x0, x1, s4));
     addChart(id, "ch-be", { type: "line", data: { datasets: ds },
-      options: baseOpts({ yt: v => fmt(v, 0) + "%", tip: { title: items => items.length ? "Vto. " + fdate(items[0].parsed.x) : "", label: c => ` ${c.dataset.label}: ${pct(c.parsed.y)}` } }) });
+      options: baseOpts({ yt: v => axisNum(v) + "%", tip: { title: items => items.length ? "Vto. " + fdate(items[0].parsed.x) : "", label: c => ` ${c.dataset.label}: ${pct(c.parsed.y)}` } }) });
   }
 
   addChart(id, "ch-curvas", { type: "line", data: { datasets: [
     line("Tasa fija · TEA nominal", o.fija.map(x => ({ x: x.vtoT, y: x.tea, t: x.t })), s1, dot),
     line("CER · TIR real", o.cer.filter(b => b.tir != null).map(b => ({ x: b.vtoT, y: b.tir, t: b.t })), s3, dot),
-  ] }, options: baseOpts({ yt: v => fmt(v, 0) + "%", tip: { title: dateTitle, label: c => ` ${c.raw.t}: ${pct(c.parsed.y, 2)}` } }) });
+  ] }, options: baseOpts({ yt: v => axisNum(v) + "%", tip: { title: dateTitle, label: c => ` ${c.raw.t}: ${pct(c.parsed.y, 2)}` } }) });
 
   const from = Date.UTC(2021, 0, 1);
   const remSh = o.S.rem.map(p => { const d = new Date(p.t); return { x: Date.UTC(d.getUTCFullYear() + 1, d.getUTCMonth() + 1, 0), y: p.v }; }).filter(p => p.x >= from);
   addChart(id, "ch-rem", { type: "line", data: { datasets: [
     line("Inflación interanual efectiva", o.S.infA.filter(p => p.t >= from).map(p => ({ x: p.t, y: p.v })), s1),
     line("Esperada por el REM 12 meses antes", remSh, s2, { borderDash: [5, 3] }),
-  ] }, options: baseOpts({ yt: v => fmt(v, 0) + "%", y: { type: "logarithmic", ticks: { color: css("--ink-2"), callback: v => [10, 20, 30, 50, 100, 200, 300].includes(v) ? v + "%" : "" } },
+  ] }, options: baseOpts({ yt: v => axisNum(v) + "%", y: { type: "logarithmic", ticks: { color: css("--ink-2"), callback: v => [10, 20, 30, 50, 100, 200, 300].includes(v) ? v + "%" : "" } },
     tip: { title: items => items.length ? fmon(items[0].parsed.x) : "", label: c => ` ${c.dataset.label}: ${pct(c.parsed.y)}` } }) });
 }
 

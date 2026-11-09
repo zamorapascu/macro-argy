@@ -36,5 +36,6 @@ function drawTab(id) {
   if (!STATE || !t || !t.draw || !window.Chart || drawn.has(id)) return;
   drawn.add(id); destroyCharts(id); t.draw(STATE);
 }
-// Cambio de tema: redibuja solo las pestañas que ya tienen gráficos
-function redrawDrawn() { for (const id of [...drawn]) { drawn.delete(id); } drawTab(currentTab()); }
+// Cambio de tema o datos nuevos: invalida lo dibujado y redibuja la pestaña visible (el resto, al abrirlas)
+function redrawDrawn() { drawn.clear(); drawTab(currentTab()); }
+function renderAll() { TABS.forEach(t => t.render && t.render(STATE, STATE.res)); redrawDrawn(); }

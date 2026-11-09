@@ -12,7 +12,8 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 FRONT = ROOT / "front"
 # Orden de carga: todo comparte un solo scope, así que los nombres de nivel superior no pueden repetirse.
 JS_ORDER = ["config", "util", "load", "calc", "charts", "tabs",
-            "tab-resumen", "tab-inflacion", "tab-dolar", "tab-reservas", "main"]
+            "tab-resumen", "tab-inflacion", "tab-dolar", "tab-mercados", "tab-reservas",
+            "tab-actividad", "tab-mundo", "main"]
 
 
 def safe(s):  # evita cerrar el <script> por accidente

@@ -1,11 +1,21 @@
 # Macro Argentina
 
-Dashboard de macro argentina para seguir inversiones, organizado en pestañas: **Resumen**, **Inflación esperada** (REM vs. inflación implícita de LECAP/BONCAP contra Boncer), **Dólar** (mayorista, MEP y bandas) y **Reservas y tasas**.
+Dashboard de macro argentina para seguir inversiones, organizado en pestañas:
+
+- **Resumen**: indicadores clave.
+- **Inflación esperada**: REM vs. inflación implícita de LECAP/BONCAP contra Boncer.
+- **Dólar**: mayorista, MEP, CCL, bandas y brechas.
+- **Riesgo país y bonos**: EMBI y Globales GD30/GD35.
+- **Reservas y tasas**: reservas, compras de divisas del BCRA, base monetaria y tasas en pesos.
+- **Actividad**: EMAE, industria (IPI), construcción (ISAC), comercio exterior y términos del intercambio (INDEC).
+- **El mundo**: tasas de la Fed, BCE, Bank of England y Selic; inflación de EE.UU., zona euro y Brasil; bolsas, empleo, Brent y real.
 
 ## Cómo funciona
 
-- El navegador descarga los datos en vivo de [BCRA](https://api.bcra.gob.ar), [ArgentinaDatos](https://argentinadatos.com) y [data912](https://data912.com), y calcula todo en el front.
-- Si alguna fuente no responde, usa la foto de respaldo (`data/snapshot.json`) embebida en el HTML.
+- Al abrir, la página muestra al instante la foto embebida (`data/snapshot.json`) y después la reemplaza con los datos en vivo.
+- **En vivo** (el navegador las consulta directo, tienen CORS): BCRA, ArgentinaDatos, data912, INDEC vía datos.gob.ar, Banco Central do Brasil y Eurostat.
+- **Solo en la foto** (`live: false`, no permiten consultas desde el navegador): FRED y Bank of England. Se actualizan al correr `back/fetch.py`.
+- Si una fuente en vivo no responde, se usa la de la foto. Las notas de fuente indican "foto del dd/mm" cuando corresponde.
 - El "back" es Python (solo librería estándar): descarga la foto y arma el archivo publicable. No hay servidor, así que sigue funcionando en GitHub Pages y abriendo `index.html` con doble clic.
 
 ## Estructura
@@ -48,6 +58,12 @@ Sin `--fetch`, `build.py` rearma el `index.html` con la foto que ya hay. GitHub 
 2. Sumar `"tab-<nombre>"` a `JS_ORDER` en `back/build.py` (el orden define el de las pestañas).
 
 Todos los archivos JS comparten un solo scope: no repetir nombres de `const`/`function` de nivel superior.
+
+## Agregar una fuente
+
+1. En `config/sources.json`, sumar un objeto a `sources` con `key` única, `kind` y su ventana (`desde` o `days`). Poner `live: true` solo si la API permite CORS.
+2. Si el `kind` es nuevo: sumar su URL en `URL_BY_KIND` (`front/js/config.js`) y en `url()` (`back/fetch.py`), y su parser en `PARSE` (`front/js/util.js`). Las fuentes no live se guardan normalizadas como pares `[fecha, valor]` en `process()` de `fetch.py`.
+3. La serie queda disponible como `STATE.S.<key>` (para `datosgob`, una por nombre en `series`).
 
 ## Agregar un Boncer
 
