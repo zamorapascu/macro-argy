@@ -319,9 +319,14 @@ function compute(res) {
   // Compras de divisas del BCRA: suma de la semana (lunes a viernes) del último dato y del mes
   const c = last(S.compras);
   if (c) {
-    const d = new Date(c.t), lunes = c.t - ((d.getUTCDay() + 6) % 7) * DAY, mes = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1);
+    const d = new Date(c.t), mes = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1);
     const sum = t0 => since(S.compras, t0).reduce((a, p) => a + p.v, 0);
-    out.compras = { t: c.t, semana: sum(lunes), lunes, mes: sum(mes), anio: sum(Date.UTC(d.getUTCFullYear(), 0, 1)) };
+    // Semana del último dato; si tiene menos de 2 días informados, la última semana completa
+    let lunes = c.t - ((d.getUTCDay() + 6) % 7) * DAY;
+    const week = l => S.compras.filter(p => p.t >= l && p.t < l + 7 * DAY);
+    if (week(lunes).length < 2) lunes -= 7 * DAY;
+    const w = week(lunes);
+    out.compras = { t: c.t, semana: w.reduce((a, p) => a + p.v, 0), dias: w.length, lunes, mes: sum(mes), anio: sum(Date.UTC(d.getUTCFullYear(), 0, 1)) };
   }
   // Compras por mes (para el gráfico de barras)
   const porMes = {};
@@ -433,7 +438,7 @@ function renderTiles(o) {
   const r = last(S.reservas), r30 = r && at(S.reservas, r.t - 30 * DAY);
   T.push({ k: "Reservas brutas", v: "US$ " + fmt(r && r.v / 1000, 1) + " mil M", d: r30 ? `<span class="${cls(r.v - r30.v)}">${signed(r.v - r30.v, 0)}<\/span> M en 30 días` : "", src: r ? `BCRA 1 · ${fdate(r.t)}` : "BCRA 1" });
   const cp = o.compras;
-  T.push({ k: "Compras del BCRA", v: cp ? "US$ " + fmt(cp.semana, 0) + " M" : "—", d: cp ? `Semana del ${fdate(cp.lunes)} · en el mes ${signed(cp.mes, 0)} M` : "", src: cp ? `BCRA 78 · al ${fdate(cp.t)}` : "BCRA 78" });
+  T.push({ k: "Compras del BCRA", v: cp ? "US$ " + fmt(cp.semana, 0) + " M" : "—", d: cp ? `Semana del ${fdate(cp.lunes)} (${cp.dias} días informados)` : "", src: cp ? `BCRA 78 · al ${fdate(cp.t)}` : "BCRA 78" });
   T.push({ k: "Inflación mensual", v: pct(o.infM && o.infM.v), d: o.infA ? `Interanual ${pct(o.infA.v)} · ${fmon(o.infM.t)}` : "", src: "BCRA 27 / 28 · INDEC" });
   T.push({ k: "Esperada a 12 meses (REM)", v: pct(o.rem && o.rem.v), d: o.infAnualizada != null ? `Actual anualizada ${pct(o.infAnualizada)}` : "", src: o.rem ? `BCRA 29 · REM ${fmon(o.rem.t)}` : "BCRA 29" });
   const beL = [...o.be].reverse().find(x => x.be != null && !x.ext) || [...o.be].reverse().find(x => x.be != null);
@@ -646,7 +651,7 @@ function renderReservas(o) {
     o.tasas.map(x => `<tr><td>${x.n}${x.t ? `<span class="sub">${fdate(x.t)}<\/span>` : ""}<\/td><td class="n">${pct(x.tna, 2)}<\/td><td class="n">${pct(x.tea)}<\/td><td class="n ${cls(x.real)}">${signed(x.real, 1, "%")}<\/td><\/tr>`).join("") + `<\/tbody>`;
   const cp = o.compras;
   document.getElementById("tb-compras").innerHTML = cp ?
-    `<tbody><tr><td>Semana del ${fdate(cp.lunes)}<\/td><td class="n">US$ ${fmt(cp.semana, 0)} M<\/td><\/tr>` +
+    `<tbody><tr><td>Semana del ${fdate(cp.lunes)}<span class="sub">${cp.dias} días informados<\/span><\/td><td class="n">US$ ${fmt(cp.semana, 0)} M<\/td><\/tr>` +
     `<tr><td>En el mes<\/td><td class="n">US$ ${fmt(cp.mes, 0)} M<\/td><\/tr>` +
     `<tr><td>En el año<\/td><td class="n">US$ ${fmt(cp.anio, 0)} M<\/td><\/tr><\/tbody>` : `<tbody><tr><td>Sin datos.<\/td><\/tr><\/tbody>`;
   document.getElementById("src-compras").textContent = `Fuente: BCRA serie 78 · último dato ${cp ? fdate(cp.t) : "—"}${origin("compras")}`;

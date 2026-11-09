@@ -5,7 +5,7 @@ function renderReservas(o) {
     o.tasas.map(x => `<tr><td>${x.n}${x.t ? `<span class="sub">${fdate(x.t)}</span>` : ""}</td><td class="n">${pct(x.tna, 2)}</td><td class="n">${pct(x.tea)}</td><td class="n ${cls(x.real)}">${signed(x.real, 1, "%")}</td></tr>`).join("") + `</tbody>`;
   const cp = o.compras;
   document.getElementById("tb-compras").innerHTML = cp ?
-    `<tbody><tr><td>Semana del ${fdate(cp.lunes)}</td><td class="n">US$ ${fmt(cp.semana, 0)} M</td></tr>` +
+    `<tbody><tr><td>Semana del ${fdate(cp.lunes)}<span class="sub">${cp.dias} días informados</span></td><td class="n">US$ ${fmt(cp.semana, 0)} M</td></tr>` +
     `<tr><td>En el mes</td><td class="n">US$ ${fmt(cp.mes, 0)} M</td></tr>` +
     `<tr><td>En el año</td><td class="n">US$ ${fmt(cp.anio, 0)} M</td></tr></tbody>` : `<tbody><tr><td>Sin datos.</td></tr></tbody>`;
   document.getElementById("src-compras").textContent = `Fuente: BCRA serie 78 · último dato ${cp ? fdate(cp.t) : "—"}${origin("compras")}`;

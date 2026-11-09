@@ -67,9 +67,14 @@ function compute(res) {
   // Compras de divisas del BCRA: suma de la semana (lunes a viernes) del último dato y del mes
   const c = last(S.compras);
   if (c) {
-    const d = new Date(c.t), lunes = c.t - ((d.getUTCDay() + 6) % 7) * DAY, mes = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1);
+    const d = new Date(c.t), mes = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1);
     const sum = t0 => since(S.compras, t0).reduce((a, p) => a + p.v, 0);
-    out.compras = { t: c.t, semana: sum(lunes), lunes, mes: sum(mes), anio: sum(Date.UTC(d.getUTCFullYear(), 0, 1)) };
+    // Semana del último dato; si tiene menos de 2 días informados, la última semana completa
+    let lunes = c.t - ((d.getUTCDay() + 6) % 7) * DAY;
+    const week = l => S.compras.filter(p => p.t >= l && p.t < l + 7 * DAY);
+    if (week(lunes).length < 2) lunes -= 7 * DAY;
+    const w = week(lunes);
+    out.compras = { t: c.t, semana: w.reduce((a, p) => a + p.v, 0), dias: w.length, lunes, mes: sum(mes), anio: sum(Date.UTC(d.getUTCFullYear(), 0, 1)) };
   }
   // Compras por mes (para el gráfico de barras)
   const porMes = {};

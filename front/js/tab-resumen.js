@@ -13,7 +13,7 @@ function renderTiles(o) {
   const r = last(S.reservas), r30 = r && at(S.reservas, r.t - 30 * DAY);
   T.push({ k: "Reservas brutas", v: "US$ " + fmt(r && r.v / 1000, 1) + " mil M", d: r30 ? `<span class="${cls(r.v - r30.v)}">${signed(r.v - r30.v, 0)}</span> M en 30 días` : "", src: r ? `BCRA 1 · ${fdate(r.t)}` : "BCRA 1" });
   const cp = o.compras;
-  T.push({ k: "Compras del BCRA", v: cp ? "US$ " + fmt(cp.semana, 0) + " M" : "—", d: cp ? `Semana del ${fdate(cp.lunes)} · en el mes ${signed(cp.mes, 0)} M` : "", src: cp ? `BCRA 78 · al ${fdate(cp.t)}` : "BCRA 78" });
+  T.push({ k: "Compras del BCRA", v: cp ? "US$ " + fmt(cp.semana, 0) + " M" : "—", d: cp ? `Semana del ${fdate(cp.lunes)} (${cp.dias} días informados)` : "", src: cp ? `BCRA 78 · al ${fdate(cp.t)}` : "BCRA 78" });
   T.push({ k: "Inflación mensual", v: pct(o.infM && o.infM.v), d: o.infA ? `Interanual ${pct(o.infA.v)} · ${fmon(o.infM.t)}` : "", src: "BCRA 27 / 28 · INDEC" });
   T.push({ k: "Esperada a 12 meses (REM)", v: pct(o.rem && o.rem.v), d: o.infAnualizada != null ? `Actual anualizada ${pct(o.infAnualizada)}` : "", src: o.rem ? `BCRA 29 · REM ${fmon(o.rem.t)}` : "BCRA 29" });
   const beL = [...o.be].reverse().find(x => x.be != null && !x.ext) || [...o.be].reverse().find(x => x.be != null);
