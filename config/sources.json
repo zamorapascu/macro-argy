@@ -1,0 +1,58 @@
+{
+  "_doc": "Cada fuente tiene key única, kind (cómo se arma la URL y se parsea) y live (si el navegador puede consultarla: requiere CORS). Las live:false solo entran por la foto que arma back/fetch.py. Ventanas: desde (fecha fija) o days (hacia atrás desde hoy).",
+  "sources": [
+    {"key": "reservas",  "kind": "bcra", "id": 1,    "desde": "2024-01-01", "live": true},
+    {"key": "mayorista", "kind": "bcra", "id": 5,    "desde": "2025-01-01", "live": true},
+    {"key": "badlar",    "kind": "bcra", "id": 7,    "days": 120, "live": true},
+    {"key": "pf30",      "kind": "bcra", "id": 12,   "days": 120, "live": true},
+    {"key": "base",      "kind": "bcra", "id": 15,   "days": 800, "live": true},
+    {"key": "infM",      "kind": "bcra", "id": 27,   "desde": "2020-01-01", "live": true},
+    {"key": "infA",      "kind": "bcra", "id": 28,   "desde": "2020-01-01", "live": true},
+    {"key": "rem",       "kind": "bcra", "id": 29,   "desde": "2019-01-01", "live": true},
+    {"key": "cer",       "kind": "bcra", "id": 30,   "days": 90,  "live": true},
+    {"key": "tamar",     "kind": "bcra", "id": 44,   "days": 120, "live": true},
+    {"key": "compras",   "kind": "bcra", "id": 78,   "days": 400, "live": true},
+    {"key": "bandaInf",  "kind": "bcra", "id": 1187, "desde": "2025-04-01", "live": true},
+    {"key": "bandaSup",  "kind": "bcra", "id": 1188, "desde": "2025-04-01", "live": true},
+
+    {"key": "mep",    "kind": "argdatos", "path": "cotizaciones/dolares/bolsa",           "field": "venta", "days": 600, "live": true},
+    {"key": "ccl",    "kind": "argdatos", "path": "cotizaciones/dolares/contadoconliqui", "field": "venta", "days": 600, "live": true},
+    {"key": "riesgo", "kind": "argdatos", "path": "finanzas/indices/riesgo-pais",         "field": "valor", "days": 600, "live": true},
+    {"key": "letras", "kind": "json", "url": "https://api.argentinadatos.com/v1/finanzas/letras", "live": true},
+    {"key": "bonos",  "kind": "json", "url": "https://data912.com/live/arg_bonds", "keep_prefixes": ["TZX", "TX", "AL", "GD"], "live": true},
+
+    {"key": "gd30", "kind": "d912_hist", "ticker": "GD30D", "days": 600, "live": true},
+    {"key": "gd35", "kind": "d912_hist", "ticker": "GD35D", "days": 600, "live": true},
+
+    {"key": "indec_m", "kind": "datosgob", "desde": "2022-01-01", "live": true, "series": {
+      "emae": "143.3_NO_PR_2004_A_21", "emaeSe": "143.3_NO_PR_2004_A_31", "emaeTc": "143.3_NO_PR_2004_A_28",
+      "ipi": "453.1_SERIE_ORIGNAL_0_0_14_46", "ipiSe": "453.1_SERIE_DESEADA_0_0_24_58", "ipiTc": "453.1_SERIE_TENDCLO_0_0_21_61",
+      "isac": "33.2_ISAC_NIVELRAL_0_M_18_63", "isacSe": "33.2_ISAC_SIN_EDAD_0_M_23_56",
+      "expo": "74.3_IET_0_M_16", "impo": "74.3_IIT_0_M_25", "saldo": "74.3_ISC_0_M_19"}},
+    {"key": "indec_t", "kind": "datosgob", "desde": "2018-01-01", "live": true, "series": {"tdi": "82.2_ITI_2004_T_27"}},
+
+    {"key": "selic", "kind": "bcb_sgs", "id": 432,   "days": 800, "live": true},
+    {"key": "ptax",  "kind": "bcb_sgs", "id": 1,     "days": 730,  "live": true},
+    {"key": "ipca",  "kind": "bcb_sgs", "id": 13522, "days": 1500, "live": true},
+
+    {"key": "hicp", "kind": "eurostat", "dataset": "prc_hicp_minr", "params": {"geo": "EA", "coicop18": "TOTAL", "unit": "RCH_A"}, "desde": "2022-01", "live": true},
+
+    {"key": "sp500",  "kind": "fred", "id": "SP500",        "days": 730,  "live": false},
+    {"key": "nasdaq", "kind": "fred", "id": "NASDAQCOM",    "days": 730,  "live": false},
+    {"key": "ust10",  "kind": "fred", "id": "DGS10",        "days": 1000, "live": false},
+    {"key": "fed",    "kind": "fred", "id": "DFEDTARU",     "days": 1000, "live": false},
+    {"key": "ecb",    "kind": "fred", "id": "ECBDFR",       "days": 1000, "live": false},
+    {"key": "brent",  "kind": "fred", "id": "DCOILBRENTEU", "days": 730,  "live": false},
+    {"key": "payems", "kind": "fred", "id": "PAYEMS",       "days": 1100, "live": false},
+    {"key": "unrate", "kind": "fred", "id": "UNRATE",       "days": 1100, "live": false},
+    {"key": "uscpi",  "kind": "fred", "id": "CPIAUCSL",     "days": 1900, "live": false},
+    {"key": "boe",    "kind": "boe",  "code": "IUDBEDR",    "days": 1000, "live": false}
+  ],
+  "boncer": [
+    {"t": "TZXD6", "vto": "2026-12-15", "base": 271.0476},
+    {"t": "TZX27", "vto": "2027-06-30", "base": 200.388},
+    {"t": "TZXD7", "vto": "2027-12-15", "base": 271.0476},
+    {"t": "TZX28", "vto": "2028-06-30", "base": 200.388}
+  ],
+  "boncer_pendientes": ["TZXM7", "TZXA7", "TZXY7", "TZXS7", "TZXO7", "TZXM8", "TZXS8", "TZXM9"]
+}
